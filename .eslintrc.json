@@ -1,0 +1,27 @@
+{
+    "extends": [
+        "airbnb"
+    ],
+    "rules": {
+        "import/no-cycle": "off",
+        "object-curly-newline": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "jsx-a11y/anchor-is-valid": 0,
+        "react/jsx-filename-extension": [
+            1,
+            {
+                "extensions": [
+                    ".js",
+                    ".jsx"
+                ]
+            }
+        ],
+        "react/jsx-props-no-spreading": "off"
+    },
+    "globals": {
+        "localStorage": true,
+        "document": true,
+        "window": true,
+        "fetch": true
+    }
+}
