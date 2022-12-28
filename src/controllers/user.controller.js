@@ -2,6 +2,9 @@ const dotenv = require('dotenv');
 
 const { User } = require('../models');
 dotenv.config();
+const bcrypt = require('bcrypt');
+
+const { generateAccessToken } = require('../utils/user');
 
 // Create and Save a new User
 const singUp = async (req, res) => {
@@ -58,12 +61,16 @@ const singUp = async (req, res) => {
         password: req.body.password,
     };
 
+    const accessToken = await generateAccessToken(newUser);
+
     // Save User in the database
     User.create(newUser)
         .then((data) => {
-            res.send(data);
-        }
-        )
+            res.send({
+                accessToken,
+                data,
+            });
+        })
         .catch((err) => {
             res.status(500).send({
                 message: err.message || 'Some error occurred while creating the User.',
@@ -96,8 +103,46 @@ const listAll = async (req, res) => {
         );
 };
 
+
+// login
+const login = async (req, res) => {
+    // Find a single User with an username
+    const user = await User.findOne({
+        where: {
+            username: req.body.username,
+        },
+    });
+    if (!user) {
+        res.status(404).send({
+            message: 'User not found.',
+        });
+        return;
+    }
+    // check if password is correct
+    const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+    if (!passwordIsValid) {
+        res.status(401).send({
+            accessToken: null,
+            message: 'Invalid Password!',
+        });
+        return;
+    }
+    // generate token
+    const accessToken = await generateAccessToken(user);
+
+    res.status(200).send({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        accessToken: accessToken,
+        tokenType: 'Bearer',
+    });
+};
+
+
 module.exports = {
     singUp,
+    login,
     listAll,
 };
 
