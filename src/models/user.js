@@ -7,7 +7,10 @@ const uuid = require('uuid');
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
         static associate(models) {
-            // define association here
+            User.hasMany(models.Hydrant, {
+                foreignKey: 'updated_by',
+                as: 'hydrants',
+            });
         }
     }
     User.init({
